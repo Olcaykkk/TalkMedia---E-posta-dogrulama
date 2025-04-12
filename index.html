@@ -1,10 +1,39 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Doğrulama Başarılı</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      background: rgba(255,255,255,0.1);
+      padding: 40px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: white;
+      color: #0072ff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -12,5 +41,45 @@
     <p>Artık rahatça TalksMedia'da takılabilirsiniz.</p>
     <a href="https://talksmedia.netlify.app" class="btn">Ana Sayfaya Dön</a>
   </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJ4F_4_9CZhrgA4LYfAAS0baCPGsw9tok",
+      authDomain: "talksmedia-835f6.firebaseapp.com",
+      projectId: "talksmedia-835f6",
+      storageBucket: "talksmedia-835f6.appspot.com",
+      messagingSenderId: "476585664187",
+      appId: "1:476585664187:web:47699ad2f4dcd259ce939e",
+      measurementId: "G-C2VSPZDN2G"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user && user.emailVerified) {
+        try {
+          // Kullanıcıyı Firestore'a kaydet
+          await db.collection("users").doc(user.uid).set({
+            email: user.email,
+            uid: user.uid,
+            verified: true,
+            createdAt: new Date().toISOString()
+          });
+          console.log("Kullanıcı doğrulandı ve veritabanına kaydedildi.");
+        } catch (e) {
+          console.error("Veritabanına kayıt başarısız:", e);
+        }
+      } else {
+        console.log("Henüz giriş yapılmamış veya e-posta doğrulanmamış.");
+      }
+    });
+  </script>
 </body>
 </html>
